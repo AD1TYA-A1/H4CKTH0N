@@ -106,7 +106,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signUp" className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,194,139,0.4)]">
+            <Link href="/route" className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,194,139,0.4)]">
               Report an Issue
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
