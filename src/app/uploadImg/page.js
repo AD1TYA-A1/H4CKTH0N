@@ -36,7 +36,27 @@ export default function UploadTest() {
         } else {
             alert('Upload failed!')
         }
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
 
+        const raw = JSON.stringify({
+            "url": result.url
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        fetch("/api/uploadURL", requestOptions)
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(result);
+                
+            })
+            .catch((error) => console.error(error));
         setLoading(false)
     }
 
