@@ -8,6 +8,7 @@ export async function POST(request) {
         const body = await request.json();
 
         const result = await db.collection("imgURL").insertOne({
+            status:"pending", // By default
             upvotes:0, // By default
             caption: body.caption,
             url: body.url || null,
