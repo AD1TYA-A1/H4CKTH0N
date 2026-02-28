@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const STATUS_CONFIG = {
-  pending:    { label: "Pending",     color: "text-yellow-400",  bg: "bg-yellow-500/10",  border: "border-yellow-500/30",  dot: "bg-yellow-400"  },
-  inprogress: { label: "In Progress", color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/30",    dot: "bg-blue-400"    },
-  completed:  { label: "Completed",   color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", dot: "bg-emerald-400" },
+  pending: { label: "Pending", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30", dot: "bg-yellow-400" },
+  inprogress: { label: "In Progress", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/30", dot: "bg-blue-400" },
+  completed: { label: "Completed", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", dot: "bg-emerald-400" },
 };
 
 function timeAgo(dateStr) {
@@ -109,9 +109,9 @@ function IssueCard({ issue, onStatusChange, isUpdating }) {
           <p className="text-[11px] text-[#444] mb-2 uppercase tracking-widest">Update Status</p>
           <div className="flex gap-1.5">
             {[
-              { key: "pending",    label: "Pending"    },
+              { key: "pending", label: "Pending" },
               { key: "inprogress", label: "In Progress" },
-              { key: "completed",  label: "Completed"  },
+              { key: "completed", label: "Completed" },
             ].map(({ key, label }) => {
               const c = STATUS_CONFIG[key];
               const isActive = status === key;
@@ -183,18 +183,28 @@ export default function AdminDashBoard() {
   const updateStatus = async (id, newStatus) => {
     setUpdatingId(id);
     try {
+      // Find the full issue object to get caption and url
+      const issue = issues.find((i) => i._id === id);
+      if (!issue) return;
+
       const res = await fetch("/api/updateStatus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({
+          caption: issue.caption,
+          url: issue.url,
+          status: newStatus,
+        }),
       });
       const data = await res.json();
       if (data.success) {
         setIssues((prev) =>
-          prev.map((issue) =>
-            issue._id === id ? { ...issue, status: newStatus } : issue
+          prev.map((i) =>
+            i._id === id ? { ...i, status: newStatus } : i
           )
         );
+      } else {
+        console.error("Status update failed:", data.message);
       }
     } catch (err) {
       console.error("Status update failed:", err);
@@ -218,10 +228,10 @@ export default function AdminDashBoard() {
     : issues.filter((i) => getStatus(i) === filterStatus);
 
   const counts = {
-    all:        issues.length,
-    pending:    issues.filter((i) => getStatus(i) === "pending").length,
+    all: issues.length,
+    pending: issues.filter((i) => getStatus(i) === "pending").length,
     inprogress: issues.filter((i) => getStatus(i) === "inprogress").length,
-    completed:  issues.filter((i) => getStatus(i) === "completed").length,
+    completed: issues.filter((i) => getStatus(i) === "completed").length,
   };
 
   return (
@@ -267,17 +277,16 @@ export default function AdminDashBoard() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { key: "all",        label: "Total",       icon: "📋", color: "text-white"        },
-            { key: "pending",    label: "Pending",     icon: "⏳", color: "text-yellow-400"   },
-            { key: "inprogress", label: "In Progress", icon: "🔧", color: "text-blue-400"     },
-            { key: "completed",  label: "Completed",   icon: "✅", color: "text-emerald-400"  },
+            { key: "all", label: "Total", icon: "📋", color: "text-white" },
+            { key: "pending", label: "Pending", icon: "⏳", color: "text-yellow-400" },
+            { key: "inprogress", label: "In Progress", icon: "🔧", color: "text-blue-400" },
+            { key: "completed", label: "Completed", icon: "✅", color: "text-emerald-400" },
           ].map(({ key, label, icon, color }) => (
             <div
               key={key}
               onClick={() => setFilterStatus(key)}
-              className={`bg-[#111318] border rounded-2xl p-4 cursor-pointer transition-all hover:-translate-y-0.5 ${
-                filterStatus === key ? "border-red-500/40" : "border-[#1e2028] hover:border-[#2e3038]"
-              }`}
+              className={`bg-[#111318] border rounded-2xl p-4 cursor-pointer transition-all hover:-translate-y-0.5 ${filterStatus === key ? "border-red-500/40" : "border-[#1e2028] hover:border-[#2e3038]"
+                }`}
             >
               <p className="text-xl mb-1">{icon}</p>
               <p className={`text-3xl font-extrabold ${color}`}>{counts[key]}</p>
@@ -289,10 +298,10 @@ export default function AdminDashBoard() {
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-6 flex-wrap">
           {[
-            { key: "all",        label: "All Issues"     },
-            { key: "pending",    label: "⏳ Pending"      },
-            { key: "inprogress", label: "🔧 In Progress"  },
-            { key: "completed",  label: "✅ Completed"    },
+            { key: "all", label: "All Issues" },
+            { key: "pending", label: "⏳ Pending" },
+            { key: "inprogress", label: "🔧 In Progress" },
+            { key: "completed", label: "✅ Completed" },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -325,7 +334,7 @@ export default function AdminDashBoard() {
             <p className="text-sm">Loading issues from database…</p>
           </div>
 
-        /* Empty */
+          /* Empty */
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📭</div>
@@ -333,11 +342,12 @@ export default function AdminDashBoard() {
             <p className="text-[#333] text-sm mt-2">No reports match this filter</p>
           </div>
 
-        /* Grid */
+          /* Grid */
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
             {filtered.map((issue) => (
               <IssueCard
+
                 key={issue._id}
                 issue={issue}
                 onStatusChange={updateStatus}
