@@ -88,7 +88,7 @@ export default function GetLocation() {
                             setUserName(""); setMyOTP(""); setUserpNo("");
                             setTimeout(() => {
                                 localStorage.setItem('userData', JSON.stringify({ userName: userName, pNo: userpNo }));
-                                router.push("/")
+                                router.push("/dashBoard")
                             }, 2000);
                         })
                         .catch((error) => console.error(error));

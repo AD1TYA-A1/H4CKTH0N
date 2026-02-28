@@ -154,7 +154,7 @@ export default function AdminDashBoard() {
   // ─── Auth Guard ───────────────────────────────────────────────
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
-    if (!isAdmin) { router.push("/adminLogin"); return; }
+    if (!isAdmin) { router.push("/adminLogIn"); return; }
     setAdminUser(localStorage.getItem("adminUser") || "Admin");
     fetchAllIssues();
   }, []);
@@ -207,7 +207,7 @@ export default function AdminDashBoard() {
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
     localStorage.removeItem("adminUser");
-    router.push("/adminLogin");
+    router.push("/adminLogIn");
   };
 
   // ─── Derived ─────────────────────────────────────────────────
