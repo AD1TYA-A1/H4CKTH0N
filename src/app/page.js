@@ -89,7 +89,7 @@ export default function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-2 text-sm text-emerald-400 mb-8">
             <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            Under Viksit Bharat Initiative · SDG 9 & 11
+            Under Viksit Bharat Initiative 
           </div>
 
           <h1 className="text-6xl md:text-8xl font-bold leading-none mb-6 tracking-tight">
@@ -106,7 +106,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/route" className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,194,139,0.4)]">
+            <Link href="/selectRole" className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,194,139,0.4)]">
               Report an Issue
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
@@ -226,7 +226,7 @@ export default function LandingPage() {
             <span className="text-white/60 text-sm">CityFix · Lakshagriha Hackathon 2026</span>
           </div>
           <div className="text-white/30 text-sm">
-            Built under Viksit Bharat Initiative · SDG 9 & 11
+            Built under Viksit Bharat Initiative 
           </div>
         </div>
       </footer>

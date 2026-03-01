@@ -19,10 +19,13 @@ function timeAgo(dateStr) {
 function IssueCard({ issue, onStatusChange, isUpdating }) {
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [showFullCaption, setShowFullCaption] = useState(false);
 
   const status = issue.status || "pending";
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
   const [lng, lat] = issue.location?.coordinates || [0, 0];
+
+  const isLong = issue.caption?.length > 80;
 
   return (
     <div className="bg-[#111318] border border-[#1e2028] rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(255,80,80,0.12)]">
@@ -67,9 +70,28 @@ function IssueCard({ issue, onStatusChange, isUpdating }) {
       <div className="p-4">
 
         {/* Caption */}
-        <p className="text-[#f0f0f0] text-[15px] font-medium mb-3 leading-snug line-clamp-2">
-          {issue.caption || <span className="text-[#444] italic text-sm">No caption</span>}
-        </p>
+        <div className="mb-3">
+          <p className="text-[#f0f0f0] text-[15px] font-medium leading-snug">
+            {issue.caption
+              ? showFullCaption
+                ? issue.caption
+                : issue.caption.slice(0, 80) + (isLong ? "…" : "")
+              : <span className="text-[#444] italic text-sm">No caption</span>
+            }
+          </p>
+          {isLong && (
+            <button
+              onClick={() => setShowFullCaption((prev) => !prev)}
+              className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-red-400 hover:text-red-300 px-2.5 py-1 rounded-lg border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
+            >
+              {showFullCaption ? (
+                <> Show less <span className="text-[10px]">↑</span> </>
+              ) : (
+                <> See more <span className="text-[10px]">↓</span> </>
+              )}
+            </button>
+          )}
+        </div>
 
         {/* Location + upvotes */}
         <div className="flex items-center gap-2 mb-3.5 flex-wrap">

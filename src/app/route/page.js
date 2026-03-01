@@ -44,7 +44,7 @@ export default function RoutePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-[rgba(0,200,117,0.12)] border border-[rgba(0,200,117,0.3)] rounded-full px-4 py-1.5 text-[#00c875] text-sm mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00c875]" />
-            Under Viksit Bharat Initiative · SDG 9 &amp; 11
+            Under Viksit Bharat Initiative 
           </div>
 
           <h1 className="font-serif text-6xl font-black leading-tight mb-4">
