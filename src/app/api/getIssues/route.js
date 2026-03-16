@@ -1,3 +1,5 @@
+// Get Issues for the clients or users with respect to distance
+
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 
@@ -7,8 +9,10 @@ export async function POST(request) {
         const db = client.db('H4CKTH0N');
         const body = await request.json();
 
+
         const { lat, lng, maxDistance = 10000 } = body; // maxDistance in meters, default 10km
 
+        
         const issues = await db.collection("imgURL").find({
             location: {
                 $near: {

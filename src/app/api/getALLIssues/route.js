@@ -1,3 +1,5 @@
+// For The Admin SOO That Admin Can Get All the Issues irrespective of Distance 
+
 import clientPromise from "@/app/lib/mongodb";
 import { NextResponse } from "next/server";
 

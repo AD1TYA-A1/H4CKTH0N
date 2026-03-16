@@ -1,0 +1,10 @@
+Fix the DataBase Schema 
+
+Only One Upvote Each Person To Each Report
+
+Correct Redirections 
+
+Change the OTP thing of Admin into the email 
+(Remove the OTP thing To reduce the cose of production)
+
+

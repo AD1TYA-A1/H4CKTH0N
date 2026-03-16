@@ -186,7 +186,7 @@ export default function AdminDashBoard() {
     setLoading(true);
     setFetchError("");
     try {
-      const res = await fetch("/api/getALLIssues");
+      const res = await fetch("/api/getAllIssues");
       const data = await res.json();
       if (data.success) {
         const sorted = data.data.sort((a, b) => b.upvotes - a.upvotes);

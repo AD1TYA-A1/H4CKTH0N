@@ -31,7 +31,7 @@ export default function RoleSelect() {
         <button
           onMouseEnter={() => setHovered("user")}
           onMouseLeave={() => setHovered(null)}
-          onClick={() => router.push("/signUp")}
+          onClick={() => router.push("/route")}
           className="group flex-1 relative bg-[#111318] border border-[#1e2028] rounded-2xl p-8 flex flex-col items-center gap-4 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)] text-left"
         >
           {/* Icon */}

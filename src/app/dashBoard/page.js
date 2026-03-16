@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import IssueBoard from "../issueDashboard/page";
 import { useRouter } from "next/navigation";
 
 const MOCK_DATA = [
@@ -125,7 +126,7 @@ function IssueCard({ issue }) {
 
           {/* Upvote */}
           <button
-            onClick={()=>{handleUpvote(issue.url)}}
+            onClick={() => { handleUpvote(issue.url) }}
             className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 border transition-all duration-200 cursor-pointer ${voted
               ? "bg-red-500/15 border-red-500/50 text-red-400"
               : "bg-white/[0.04] border-[#2a2a2a] text-[#888] hover:bg-red-500/[0.08] hover:border-red-500/30 hover:text-red-400"
@@ -143,6 +144,7 @@ function IssueCard({ issue }) {
 }
 
 export default function IssuesFeed() {
+
   const router = useRouter();
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -258,10 +260,15 @@ export default function IssuesFeed() {
 
         {/* Grid */}
         {displayIssues.length > 0 && (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-            {displayIssues.map((issue) => (
-              <IssueCard key={issue._id} issue={issue} />
-            ))}
+          <div>
+
+            <IssueBoard />
+
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+              {displayIssues.map((issue) => (
+                <IssueCard key={issue._id} issue={issue} />
+              ))}
+            </div>
           </div>
         )}
       </div>
