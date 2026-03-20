@@ -3,24 +3,8 @@ import { useState, useEffect } from "react";
 import IssueBoard from "../issueDashboard/page";
 import { useRouter } from "next/navigation";
 
-const MOCK_DATA = [
-  {
-    _id: "69a1749b0ef0f309b42714fb",
-    caption: "Dam is broken",
-    url: "https://res.cloudinary.com/dyzvhcu9e/image/upload/v1772188817/cityfix/sample1.jpg",
-    createdAt: "2026-02-27T10:40:27.206+00:00",
-    location: { type: "Point", coordinates: [77.93074, 30.38484] },
-    upvotes: 12,
-  },
-  {
-    _id: "69a191546ca8a35e85f4c790",
-    caption: "Make it clean",
-    url: "https://res.cloudinary.com/dyzvhcu9e/image/upload/v1772196170/cityfix/sample2.jpg",
-    createdAt: "2026-02-27T12:43:00.840+00:00",
-    location: { type: "Point", coordinates: [77.925, 30.381] },
-    upvotes: 5,
-  },
-];
+
+
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
@@ -31,10 +15,49 @@ function timeAgo(dateStr) {
 }
 
 function IssueCard({ issue }) {
+
   const [upvotes, setUpvotes] = useState(issue.upvotes || 0);
   const [voted, setVoted] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [userName, setUserName] = useState("")
+
+  useEffect(() => {
+    setUserName(JSON.parse(localStorage.getItem("userData")).userName);
+    // (?.userName)
+    console.log(userName);
+    const upvote = false;
+    const url = issue.url
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: JSON.stringify({url , userName, upvote }),
+      redirect: "follow",
+    };
+
+    fetch("/api/upVote", requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        // if (result.setUpvotedBy.includes(userName)) {
+        //   setVoted(true)
+        // }
+        console.log(result);
+        if (result.upVote) {
+          console.log("Cannot Upvote You already Upvoted");
+          setVoted(true)
+        }else{
+          setVoted(false)
+        }
+      })
+      .catch((error) => console.error(error));
+
+
+
+
+  }, [userName])
 
   const [lng, lat] = issue.location?.coordinates || [0, 0];
 
@@ -42,28 +65,32 @@ function IssueCard({ issue }) {
     if (!voted) {
       setUpvotes((prev) => prev + 1);
       setVoted(true);
-
-
+      const upvote = true
 
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        "url": url
-      });
 
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
-        body: raw,
-        redirect: "follow"
+        body: JSON.stringify({ url, userName, upvote }),
+        redirect: "follow",
       };
 
       fetch("/api/upVote", requestOptions)
         .then((response) => response.json())
-        .then((result) => console.log(result))
+        .then((result) => {
+          // if (result.setUpvotedBy.includes(userName)) {
+          //   setVoted(true)
+          // }
+          console.log(result);
+          if (result.upVote) {
+            console.log("Cannot Upvote You already Upvoted");
+            setVoted(true)
+          }
+        })
         .catch((error) => console.error(error));
-
     } else {
       setUpvotes((prev) => prev - 1);
       setVoted(false);
@@ -72,7 +99,6 @@ function IssueCard({ issue }) {
 
   return (
     <div className="bg-[#111318] border border-[#1e2028] rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(255,80,80,0.12)]">
-
       {/* Image */}
       <div className="relative w-full aspect-video bg-[#0d0f12]">
         {!imgError ? (
@@ -110,7 +136,9 @@ function IssueCard({ issue }) {
         {/* Location */}
         <div className="flex items-center gap-1.5 text-[#555] text-xs mb-3.5">
           <span>📍</span>
-          <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+          <span>
+            {lat.toFixed(4)}°N, {lng.toFixed(4)}°E
+          </span>
         </div>
 
         {/* Footer */}
@@ -126,16 +154,51 @@ function IssueCard({ issue }) {
 
           {/* Upvote */}
           <button
-            onClick={() => { handleUpvote(issue.url) }}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 border transition-all duration-200 cursor-pointer ${voted
-              ? "bg-red-500/15 border-red-500/50 text-red-400"
-              : "bg-white/[0.04] border-[#2a2a2a] text-[#888] hover:bg-red-500/[0.08] hover:border-red-500/30 hover:text-red-400"
-              }`}
+            onClick={() => handleUpvote(issue.url)}
+            className="relative inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-200 cursor-pointer overflow-hidden group"
+            style={{
+              background: voted ? '#fcebeb' : 'var(--background)',
+              borderColor: voted ? '#f09595' : 'rgba(255,255,255,0.12)',
+            }}
           >
-            <span className={`text-base transition-transform duration-200 inline-block ${voted ? "scale-125" : "scale-100"}`}>
-              🔺
+            {/* Hover wash */}
+            {!voted && (
+              <span className="absolute inset-0 bg-red-500/[0.07] opacity-0 group-hover:opacity-100 transition-opacity duration-150 rounded-full" />
+            )}
+
+            {/* Arrow icon */}
+            <span
+              className={`relative z-10 flex items-center justify-center transition-transform duration-300 ${voted ? 'scale-125 -translate-y-px' : 'scale-100'
+                }`}
+              style={{ width: 18, height: 18 }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M7 2L12 9H2L7 2Z"
+                  fill={voted ? '#e24b4a' : 'rgba(255,255,255,0.3)'}
+                  stroke={voted ? '#e24b4a' : 'rgba(255,255,255,0.3)'}
+                  strokeWidth="0.5"
+                  strokeLinejoin="round"
+                  style={{ transition: 'fill 0.2s ease, stroke 0.2s ease' }}
+                />
+              </svg>
             </span>
-            <span className="text-[13px] font-semibold">{upvotes}</span>
+
+            {/* Count */}
+            <span
+              className="relative z-10 text-[13px] font-medium transition-colors duration-200"
+              style={{ color: voted ? '#a32d2d' : '#888' }}
+            >
+              {upvotes}
+            </span>
+
+            {/* Label */}
+            <span
+              className="relative z-10 text-[12px] tracking-wide transition-colors duration-200 group-hover:text-red-400"
+              style={{ color: voted ? '#a32d2d' : 'rgba(255,255,255,0.3)' }}
+            >
+              upvotes
+            </span>
           </button>
         </div>
       </div>
@@ -145,18 +208,18 @@ function IssueCard({ issue }) {
 
 export default function IssuesFeed() {
 
+
+
   const router = useRouter();
-  const [issues, setIssues] = useState([]);
+  const [completedIssues, setCompletedIssues] = useState([]);
+  const [inProgressIssues, setInProgressIssues] = useState([]);
+  const [pendingIssues, setPendingIssues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [useMock, setUseMock] = useState(false);
 
-  useEffect(() => {
-    const data = localStorage.getItem("userData");
-    if (!data) {
-      router.push("/");
-    }
-  }, []);
+
+
+  const totalIssues = completedIssues.length + inProgressIssues.length + pendingIssues.length;
 
   const fetchIssues = async (lat, lng) => {
     setLoading(true);
@@ -169,17 +232,18 @@ export default function IssuesFeed() {
       });
       const data = await res.json();
       if (data.success) {
-        const sorted = data.data.sort((a, b) => b.upvotes - a.upvotes); // 👈 add this
-        setIssues(sorted);
+        setCompletedIssues(data.completed || []);
+        setInProgressIssues(data.inProgress || []);
+        setPendingIssues(data.pending || []);
+      } else {
+        throw new Error("Failed to fetch");
       }
-      else throw new Error("Failed to fetch");
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
 
   const getLocation = () => {
     if (!navigator.geolocation) return setError("Geolocation not supported");
@@ -188,12 +252,6 @@ export default function IssuesFeed() {
       () => setError("Location access denied")
     );
   };
-
-  useEffect(() => {
-    if (useMock) setIssues(MOCK_DATA);
-  }, [useMock]);
-
-  const displayIssues = useMock ? MOCK_DATA : issues;
 
   return (
     <div className="min-h-screen bg-[#0a0b0e] font-sans">
@@ -205,18 +263,11 @@ export default function IssuesFeed() {
             CITY<span className="text-red-500">FIX</span>
           </h1>
           <p className="text-[#444] text-xs mt-0.5">
-            {displayIssues.length} issue{displayIssues.length !== 1 ? "s" : ""} nearby
+            {totalIssues} issue{totalIssues !== 1 ? "s" : ""} nearby
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setUseMock(true)}
-            className="bg-transparent border border-[#2a2a2a] text-[#666] px-3.5 py-2 rounded-xl text-[13px] cursor-pointer hover:border-[#444] hover:text-[#aaa] transition-all duration-200"
-          >
-            Use Mock Data
-          </button>
-
           <button
             onClick={() => router.push("/reportIssue")}
             className="bg-transparent border border-red-500 text-red-500 px-4 py-2 rounded-xl text-[13px] font-semibold cursor-pointer hover:bg-red-500/10 transition-all duration-200"
@@ -248,27 +299,111 @@ export default function IssuesFeed() {
         )}
 
         {/* Empty State */}
-        {!loading && displayIssues.length === 0 && !error && (
+        {!loading && totalIssues === 0 && !error && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🏙️</div>
             <p className="text-[#555] text-xl font-bold">No issues loaded yet</p>
             <p className="text-[#333] text-sm mt-2">
-              Click "Use My Location" or "Use Mock Data" to get started
+              Click "Use My Location" to get started
             </p>
           </div>
         )}
 
-        {/* Grid */}
-        {displayIssues.length > 0 && (
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-20">
+            <div className="text-4xl mb-4 animate-spin">⏳</div>
+            <p className="text-[#555] text-sm">Fetching issues nearby...</p>
+          </div>
+        )}
+
+        {/* Issue Sections */}
+        {totalIssues > 0 && (
           <div>
+            <div className="flex gap-4 p-4">
 
-            <IssueBoard />
+              {/* Pending */}
+              <div className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-3 flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-amber-500">
+                    Pending
+                  </span>
+                </div>
+                <span className="text-xs font-bold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                  {pendingIssues.length}
+                </span>
+              </div>
 
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-              {displayIssues.map((issue) => (
-                <IssueCard key={issue._id} issue={issue} />
-              ))}
+              {/* In Progress */}
+              <div className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-3 flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-blue-500">
+                    In Progress
+                  </span>
+                </div>
+                <span className="text-xs font-bold bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                  {inProgressIssues.length}
+                </span>
+              </div>
+
+              {/* Completed */}
+              <div className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-3 flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-green-500">
+                    Completed
+                  </span>
+                </div>
+                <span className="text-xs font-bold bg-green-500 text-white px-2 py-0.5 rounded-full">
+                  {completedIssues.length}
+                </span>
+              </div>
+
             </div>
+
+            {/* In Progress */}
+            {inProgressIssues.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-yellow-400 font-bold text-lg mb-3">
+                  🔄 In Progress ({inProgressIssues.length})
+                </h2>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+                  {inProgressIssues.map((issue) => (
+                    <IssueCard key={issue._id} issue={issue} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Pending */}
+            {pendingIssues.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-red-400 font-bold text-lg mb-3">
+                  ⏳ Pending ({pendingIssues.length})
+                </h2>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+                  {pendingIssues.map((issue) => (
+                    <IssueCard key={issue._id} issue={issue} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed */}
+            {completedIssues.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-green-400 font-bold text-lg mb-3">
+                  ✅ Completed ({completedIssues.length})
+                </h2>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+                  {completedIssues.map((issue) => (
+                    <IssueCard key={issue._id} issue={issue} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

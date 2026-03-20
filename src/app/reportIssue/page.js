@@ -107,6 +107,7 @@ export default function ReportIssue() {
   // ─── Save report (URL + caption + location) → MongoDB ─────────
   const saveReportToMongo = async (url) => {
     const payload = {
+      userName:JSON.parse(localStorage.getItem("userData"))?.userName,
       url: url || null,
       caption,
       lat: location ? parseFloat(location.lat) : null,
